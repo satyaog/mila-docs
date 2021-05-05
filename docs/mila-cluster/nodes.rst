@@ -1,6 +1,10 @@
 Cluster Nodes
 ##############
 
+.. raw:: html
+
+    <iframe src="https://dashboard.server.mila.quebec/d/DuQNAfQZz/homepage?viewPanel=4&orgId=1" height="345px" width="100%"></iframe>
+
 Complete List of Nodes
 ^^^^^^^^^^^^^^^^^^^^^^
 
