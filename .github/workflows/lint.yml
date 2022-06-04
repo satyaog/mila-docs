@@ -1,0 +1,22 @@
+name: Linting
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint_docs:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v1
+
+    - name: Install dependencies
+      run:  pip install -U 'rstcheck==5.0.0'
+
+    - name: Run rstcheck
+      run:  rstcheck -r docs
