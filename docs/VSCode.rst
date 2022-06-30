@@ -23,9 +23,9 @@ node, then connect to that node.
 The milatools_ package provides a command to make the operation easier. Simply
 run:
 
-.. code-block:: bash
+.. code-block:: console
 
-    mila code path/to/code
+   $ mila code path/to/code
 
 Note that the above command requires your SSH config to be organized in a
 certain way, so you should run ``mila init`` prior to using ``mila code`` for
@@ -68,9 +68,10 @@ instances may crash with that message because of conflicts in the lock files
 VSCode installs in ``~/.vscode-server`` (which is shared on all compute nodes).
 To fix this issue, you can change this setting in your ``settings.json`` file:
 
+.. rstcheck: ignore-next-code-block=json
 .. code-block:: json
 
-    "remote.SSH.lockfilesInTmp": true
+   "remote.SSH.lockfilesInTmp": true
 
 This will store the necessary lockfiles in ``/tmp`` on the compute nodes (which
 are local to the node).
