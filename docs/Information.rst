@@ -1,5 +1,3 @@
-.. _infra_info:
-
 Computing infrastructure and policies
 *************************************
 

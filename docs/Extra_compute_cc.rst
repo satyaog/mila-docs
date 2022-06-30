@@ -1,4 +1,3 @@
-.. highlight:: bash
 .. _cc_clusters:
 
 
@@ -126,9 +125,9 @@ uses SLURM to schedule jobs. Its full documentation can be found `here
 
 You can access Beluga via ssh:
 
-.. prompt:: bash $
+.. code-block:: console
 
-   ssh <user>@beluga.computecanada.ca
+   $ ssh <user>@beluga.computecanada.ca
 
 Where ``<user>`` is the username you created previously (see `Account Creation`_).
 
@@ -139,9 +138,9 @@ Launching Jobs
 Users must specify the resource allocation Group Name using the flag
 ``--account=rrg-bengioy-ad``.  To launch a CPU-only job:
 
-.. prompt:: bash $
+.. code-block:: console
 
-   sbatch --time=1:0:0 --account=rrg-bengioy-ad job.sh
+   $ sbatch --time=1:0:0 --account=rrg-bengioy-ad job.sh
 
 .. note::
 
@@ -149,15 +148,15 @@ Users must specify the resource allocation Group Name using the flag
 
 To launch a GPU job:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    sbatch --time=1:0:0 --account=rrg-bengioy-ad --gres=gpu:1 job.sh
+   $ sbatch --time=1:0:0 --account=rrg-bengioy-ad --gres=gpu:1 job.sh
 
 And to get an interactive session, use the ``salloc`` command:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    salloc --time=1:0:0 --account=rrg-bengioy-ad --gres=gpu:1
+   $ salloc --time=1:0:0 --account=rrg-bengioy-ad --gres=gpu:1
 
 The full documentation for jobs launching on Beluga can be found `here
 <https://docs.computecanada.ca/wiki/Running_jobs>`__.
@@ -239,9 +238,9 @@ module spider <module> Shows specific details about <module>
 
 In particular, if you with to use ``Python 3.6`` you can simply do:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    module load python/3.6
+   $ module load python/3.6
 
 .. tip:: If you wish to use Python on the cluster, we strongly encourage you to
    read `CC Python Documentation <https://docs.computecanada.ca/wiki/Python>`_,
@@ -252,9 +251,9 @@ The cluster has many Python packages (or ``wheels``), such already compiled for
 the cluster. See `here <https://docs.computecanada.ca/wiki/Python/en>`__ for the
 details. In particular, you can browse the packages by doing:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    avail_wheels <wheel>
+   $ avail_wheels <wheel>
 
 Such wheels can be installed using pip. Moreover, the most efficient way to use
 modules on the cluster is to `build your environnement inside your job
@@ -307,9 +306,9 @@ but there is a special module that can be loaded in order to allow
 training scripts to access some specific servers, which includes
 the necessary servers for using CometML and Wandb ("Weights and Biases").
 
-.. prompt:: bash $
+.. code-block:: console
 
-    module load httpproxy
+   $ module load httpproxy
 
 More documentation about this can be found `here
 <https://docs.computecanada.ca/wiki/Weights_%26_Biases_(wandb)>`__.
@@ -325,9 +324,9 @@ jobs. Its full documentation can be found `here
 
 You can access Graham via ssh:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    ssh <user>@graham.computecanada.ca
+   $ ssh <user>@graham.computecanada.ca
 
 Where ``<user>`` is the username you created previously (see `Account Creation`_).
 
@@ -348,9 +347,9 @@ jobs. Its full documentation can be found `here
 
 You can access Cedar via ssh:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    ssh <user>@cedar.computecanada.ca
+   $ ssh <user>@cedar.computecanada.ca
 
 Where ``<user>`` is the username you created previously (see `Account Creation`_).
 
@@ -373,9 +372,9 @@ jobs. Its full documentation can be found `here
 
 You can access Niagara via ssh:
 
-.. prompt:: bash $
+.. code-block:: console
 
-    ssh <user>@niagara.computecanada.ca
+   $ ssh <user>@niagara.computecanada.ca
 
 Where ``<user>`` is the username you created previously (see `Account Creation`_).
 

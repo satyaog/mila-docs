@@ -41,9 +41,9 @@ Quotas are enabled on ``$HOME`` for both disk capacity (blocks) and number of
 files (inodes). The limits for blocks and inodes are respectively 100GiB and 1
 million per user. The command to check the quota usage from a login node is:
 
-.. prompt:: bash $
+.. code-block:: console
 
-   beegfs-ctl --cfgFile=/etc/beegfs/home.d/beegfs-client.conf --getquota --uid $USER
+   $ beegfs-ctl --cfgFile=/etc/beegfs/home.d/beegfs-client.conf --getquota --uid $USER
 
 $SCRATCH
 --------

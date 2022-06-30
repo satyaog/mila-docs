@@ -3,7 +3,7 @@ The module command
 
 For a list of available modules, simply use:
 
-.. prompt:: bash $, auto
+.. code-block:: console
 
    $ module avail
    --------------------------------------------------------------------------------------------------------------- Global Aliases ---------------------------------------------------------------------------------------------------------------
@@ -36,25 +36,25 @@ For a list of available modules, simply use:
 
 Modules can be loaded using the ``load`` command:
 
-.. prompt:: bash $
+.. code-block:: console
 
-   module load <module>
+   $ module load <module>
 
 
 To search for a module or a software, use the command ``spider``:
 
 
-.. prompt:: bash $
+.. code-block:: console
 
-   module spider search_term
+   $ module spider search_term
 
 E.g.: by default, ``python2`` will refer to the os-shipped installation of ``python2.7`` and ``python3`` to ``python3.6``.
 If you want to use ``python3.7`` you can type:
 
 
-.. prompt:: bash $
+.. code-block:: console
 
-   module load python3.7
+   $ module load python3.7
 
 
 
@@ -102,16 +102,16 @@ to get the full path of the package.
 
 *Example:*
 
-.. prompt:: bash $, auto
+.. code-block:: console
 
-    $ module load pytorch/1.5.0
-    $ python -c 'import torch;print(torch.__file__)'
-    /home/mila/my_home/.local/lib/python3.7/site-packages/torch/__init__.py   <== package from your own site-package
+   $ module load pytorch/1.5.0
+   $ python -c 'import torch;print(torch.__file__)'
+   /home/mila/my_home/.local/lib/python3.7/site-packages/torch/__init__.py   <== package from your own site-package
 
 Now with the ``-s`` flag:
 
-.. prompt:: bash $, auto
+.. code-block:: console
 
-    $ module load pytorch/1.5.0
-    $ python -s -c 'import torch;print(torch.__file__)'
-    /cvmfs/ai.mila.quebec/apps/x86_64/debian/pytorch/python3.7-cuda10.1-cudnn7.6-v1.5.0/lib/python3.7/site-packages/torch/__init__.py'
+   $ module load pytorch/1.5.0
+   $ python -s -c 'import torch;print(torch.__file__)'
+   /cvmfs/ai.mila.quebec/apps/x86_64/debian/pytorch/python3.7-cuda10.1-cudnn7.6-v1.5.0/lib/python3.7/site-packages/torch/__init__.py'
