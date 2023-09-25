@@ -66,14 +66,9 @@ repository.
    +# Prepare data for training
    +mkdir -p "$SLURM_TMPDIR/data"
    +
-   +# If SLURM_JOB_CPUS_PER_NODE is defined and not empty, use the value of
-   +# SLURM_JOB_CPUS_PER_NODE. Else, use 16 workers to prepare data
-   +: ${_DATA_PREP_WORKERS:=${SLURM_JOB_CPUS_PER_NODE:-16}}
-   +
    +# Copy the dataset to $SLURM_TMPDIR so it is close to the GPUs for
    +# faster training
-   +srun --ntasks=$SLURM_JOB_NUM_NODES --ntasks-per-node=1 \
-   +    time -p python data.py "/network/datasets/inat" ${_DATA_PREP_WORKERS}
+   +srun --ntasks=$SLURM_JOB_NUM_NODES --ntasks-per-node=1 time -p python data.py
 
 
     # Fixes issues with MIG-ed GPUs with versions of PyTorch < 2.0
@@ -91,6 +86,7 @@ repository.
    """Data example."""
    import logging
    import os
+   import time
 
    import rich.logging
    import torch
@@ -103,11 +99,14 @@ repository.
    from tqdm import tqdm
 
 
+   Logger = logging.getLogger(__name__)
+
+
    def main():
        training_epochs = 1
        learning_rate = 5e-4
        weight_decay = 1e-4
-       batch_size = 256
+       batch_size = 512
 
        # Check that the GPU is available
        assert torch.cuda.is_available() and torch.cuda.device_count() > 0
@@ -119,8 +118,6 @@ repository.
            handlers=[rich.logging.RichHandler(markup=True)],  # Very pretty, uses the `rich` package.
        )
 
-       logger = logging.getLogger(__name__)
-
        # Create a model and move it to the GPU.
        model = resnet18(num_classes=10000)
        model.to(device=device)
@@ -129,10 +126,7 @@ repository.
 
        # Setup ImageNet
        num_workers = get_num_workers()
-       try:
-           dataset_path = f"{os.environ['SLURM_TMPDIR']}/data"
-       except KeyError:
-           dataset_path = "../dataset"
+       dataset_path = f"{os.environ['SLURM_TMPDIR']}/data"
        train_dataset, valid_dataset, test_dataset = make_datasets(dataset_path)
        train_dataloader = DataLoader(
            train_dataset,
@@ -140,13 +134,13 @@ repository.
            num_workers=num_workers,
            shuffle=True,
        )
-       valid_dataloader = DataLoader(
+       valid_dataloader = DataLoader(  # NOTE: Not used in this example.
            valid_dataset,
            batch_size=batch_size,
            num_workers=num_workers,
            shuffle=False,
        )
-       test_dataloader = DataLoader(  # NOTE: Not used in this example.
+       test_dataloader = DataLoader(   # NOTE: Not used in this example.
            test_dataset,
            batch_size=batch_size,
            num_workers=num_workers,
@@ -154,10 +148,18 @@ repository.
        )
 
        # Checkout the "checkpointing and preemption" example for more info!
-       logger.debug("Starting training from scratch.")
+       Logger.debug("Starting training from scratch.")
+
+       # warm-up
+       for i, batch in enumerate(train_dataloader):
+           # Move the batch to the GPU before we pass it to the model
+           batch = tuple(item.to(device) for item in batch)
+
+           if i >= 20:
+               break
 
        for epoch in range(training_epochs):
-           logger.debug(f"Starting epoch {epoch}/{training_epochs}")
+           Logger.debug(f"Starting epoch {epoch}/{training_epochs}")
 
            # Set the model in training mode (this is important for e.g. BatchNorm and Dropout layers)
            model.train()
@@ -169,9 +171,13 @@ repository.
            )
 
            # Training loop
+           n_samples = 0
+           waiting_for_data_time = 0
+           end = time.time()
            for batch in train_dataloader:
                # Move the batch to the GPU before we pass it to the model
                batch = tuple(item.to(device) for item in batch)
+               waiting_for_data_time += time.time() - end
                x, y = batch
 
                # Forward pass
@@ -183,49 +189,18 @@ repository.
                loss.backward()
                optimizer.step()
 
-               # Calculate some metrics:
-               n_correct_predictions = logits.detach().argmax(-1).eq(y).sum()
-               n_samples = y.shape[0]
-               accuracy = n_correct_predictions / n_samples
+               # measure the elapsed time between 2 batches. This is the time we
+               # wait for the data
+               end = time.time()
 
-               logger.debug(f"Accuracy: {accuracy.item():.2%}")
-               logger.debug(f"Average Loss: {loss.item()}")
+               n_samples += y.shape[0]
 
                # Advance the progress bar one step, and update the "postfix" () the progress bar. (nicer than just)
                progress_bar.update(1)
-               progress_bar.set_postfix(loss=loss.item(), accuracy=accuracy.item())
+               progress_bar.set_postfix({"Waiting for data (items/sec)":n_samples / waiting_for_data_time})
            progress_bar.close()
 
-           val_loss, val_accuracy = validation_loop(model, valid_dataloader, device)
-           logger.info(f"Epoch {epoch}: Val loss: {val_loss:.3f} accuracy: {val_accuracy:.2%}")
-
        print("Done!")
-
-
-   @torch.no_grad()
-   def validation_loop(model: nn.Module, dataloader: DataLoader, device: torch.device):
-       model.eval()
-
-       total_loss = 0.0
-       n_samples = 0
-       correct_predictions = 0
-
-       for batch in dataloader:
-           batch = tuple(item.to(device) for item in batch)
-           x, y = batch
-
-           logits: Tensor = model(x)
-           loss = F.cross_entropy(logits, y)
-
-           batch_n_samples = x.shape[0]
-           batch_correct_predictions = logits.argmax(-1).eq(y).sum()
-
-           total_loss += loss.item()
-           n_samples += batch_n_samples
-           correct_predictions += batch_correct_predictions
-
-       accuracy = correct_predictions / n_samples
-       return total_loss, accuracy
 
 
    def make_datasets(
@@ -312,12 +287,12 @@ repository.
 
 
    if __name__ == "__main__":
-       src = Path(sys.argv[1])
-       workers = int(sys.argv[2])
+       src = "/network/datasets/inat"
+       workers = os.environ["SLURM_JOB_CPUS_PER_NODE"]
        # Referencing $SLURM_TMPDIR here instead of job.sh makes sure that the
        # environment variable will only be resolved on the worker node (i.e. not
        # referencing the $SLURM_TMPDIR of the master node)
-       dest = Path(os.environ["SLURM_TMPDIR"]) / "dest"
+       dest = Path(os.environ["SLURM_TMPDIR"]) / "data"
 
        start_time = time.time()
 

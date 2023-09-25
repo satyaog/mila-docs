@@ -29,12 +29,12 @@ def link_files(src: Path, dest: Path, workers: int = 4) -> None:
 
 
 if __name__ == "__main__":
-    src = Path(sys.argv[1])
-    workers = int(sys.argv[2])
+    src = "/network/datasets/inat"
+    workers = os.environ["SLURM_JOB_CPUS_PER_NODE"]
     # Referencing $SLURM_TMPDIR here instead of job.sh makes sure that the
     # environment variable will only be resolved on the worker node (i.e. not
     # referencing the $SLURM_TMPDIR of the master node)
-    dest = Path(os.environ["SLURM_TMPDIR"]) / "dest"
+    dest = Path(os.environ["SLURM_TMPDIR"]) / "data"
 
     start_time = time.time()
 
