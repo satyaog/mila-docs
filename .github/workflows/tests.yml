@@ -28,11 +28,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Copy job script to the cluster
         run: |
-          ssh mila mkdir -p "/tmp/${GITHUB_RUN_ID}"
-          scp .github/setup_github_runner.sh mila:"/tmp/${GITHUB_RUN_ID}/setup_github_runner.sh"
+          ssh localhost mkdir -p "/tmp/${GITHUB_RUN_ID}"
+          scp .github/setup_github_runner.sh localhost:"/tmp/${GITHUB_RUN_ID}/setup_github_runner.sh"
       - name: Launch Slurm Actions Runner
         run: |
-          ssh mila "cd \"\${SCRATCH}\" && sbatch --job-name=\"gh-actions-runner-${GITHUB_RUN_ID}\" \"/tmp/${GITHUB_RUN_ID}/setup_github_runner.sh\""
+          ssh localhost "cd \"\${SCRATCH}\" && sbatch --partition=main --job-name=\"gh-actions-runner-${GITHUB_RUN_ID}\" \"/tmp/${GITHUB_RUN_ID}/setup_github_runner.sh\""
 
   # This step runs in a self-hosted Github Actions runner inside a SLURM job on a compute node of the cluster.
   slurm_integration_tests:

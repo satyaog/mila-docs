@@ -6,7 +6,7 @@
 #SBATCH --mem=16G
 #SBATCH --partition=unkillable-cpu
 #SBATCH --time=2-00:00:00
-#SBATCH --output=logs/runner-%j.out
+#SBATCH --output=/network/scratch/o/ortizgas/tmp/logs/runner-%j.out
 
 ##
 ## GitHub Actions Self-Hosted Runner Setup Script
@@ -46,7 +46,7 @@ set -o pipefail
 # Configuration
 # ============================================================================
 
-readonly REPO="mila-iqia/mila-docs"
+readonly REPO="satyaog/mila-docs"
 readonly RUNNER_VERSION="2.317.0"
 readonly RUNNER_ARCHIVE="actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz"
 readonly RUNNER_URL="https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_ARCHIVE}"
